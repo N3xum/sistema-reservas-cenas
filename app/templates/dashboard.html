@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="hero-banner mt-4" style="background-image: url('{{ url_for('static', filename='img/fondo_cena.jpg') }}');">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>Veladas Inolvidables</h1>
+        <p class="lead text-white mt-3">Gastronomía exclusiva y un ambiente rústico perfecto para compartir.</p>
+    </div>
+</div>
+
+<div class="text-center mt-5 mb-5">
+    {% if current_user.rol == 'administrador' %}
+        <h3 class="mb-4">Panel de Administración</h3>
+        <p>Bienvenido, {{ current_user.nombre }}. Aquí puedes gestionar tus clientes y organizar la disponibilidad de las mesas.</p>
+        <a href="{{ url_for('usuario_bp.listar_usuarios') }}" class="btn btn-elegant mt-2">Gestionar Usuarios</a>
+    {% else %}
+        <h3 class="mb-4">Tu Próxima Reserva</h3>
+        <p>Bienvenido, {{ current_user.nombre }}. Explora nuestros menús de tres tiempos y asegura tu fecha especial.</p>
+        <a href="#" class="btn btn-elegant mt-2">Ver Menús Disponibles</a>
+    {% endif %}
+</div>
+{% endblock %}
