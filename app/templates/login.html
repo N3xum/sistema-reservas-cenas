@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 mt-5">
+        <div class="card card-elegant p-4">
+            <h2 class="text-center mb-4">Bienvenido de Nuevo</h2>
+            <form method="POST">
+                <div class="mb-3">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-elegant w-100">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-4">
+    <h2>Gestión de Usuarios</h2>
+    
+    <form method="GET" class="d-flex mb-4 mt-3" style="max-width: 400px;">
+        <input class="form-control me-2" type="search" name="busqueda" placeholder="Buscar por nombre..." value="{{ busqueda }}">
+        <button class="btn btn-elegant" type="submit">Buscar</button>
+    </form>
+
+    <div class="card card-elegant p-3">
+        <table class="table table-hover mt-2">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id }}</td>
+                    <td>{{ usuario.nombre }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td><span class="badge" style="background-color: #5C162E;">{{ usuario.rol|capitalize }}</span></td>
+                    <td>
+                        <a href="{{ url_for('usuario_bp.editar_usuario', id=usuario.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <form action="{{ url_for('usuario_bp.eliminar_usuario', id=usuario.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No se encontraron usuarios.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -25,5 +25,19 @@ def create_app():
     with app.app_context():
         # Importamos los modelos para que Flask-Migrate los detecte
         from . import models
+        
+    # --- AÑADE ESTO AQUÍ ---
+    from .models import Usuario
+
+    # Función para que Flask-Login sepa quién es el usuario actual
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Usuario.query.get(int(user_id))
+
+    # Registramos tu módulo de usuarios
+    from .modulo_usuario import usuario_bp
+    app.register_blueprint(usuario_bp)
+    # -----------------------
+    
 
     return app
