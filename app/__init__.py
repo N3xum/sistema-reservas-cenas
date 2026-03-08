@@ -42,5 +42,8 @@ def create_app():
     from .modulo_menu import menu_bp
     app.register_blueprint(menu_bp)
     
+    # módulo de Jhilda ---
+    from .modulo_reserva import reserva_bp
+    app.register_blueprint(reserva_bp)
 
     return app
