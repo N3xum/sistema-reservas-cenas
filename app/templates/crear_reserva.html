@@ -6,7 +6,7 @@
             <h3 class="text-center mb-2">Agendar tu Velada</h3>
             <p class="text-center text-muted mb-4">Estás reservando: <strong>{{ menu.nombre_experiencia }}</strong> (Bs. {{ menu.precio }} p/p)</p>
             
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>Fecha de la Cena</label>
@@ -33,15 +33,40 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label>Peticiones Especiales o Alergias</label>
-                    <textarea name="notas_especiales" class="form-control" rows="3" placeholder="Ej. Cumpleaños, aniversario, alergia a los mariscos..."></textarea>
+                    <textarea name="notas_especiales" class="form-control" rows="2" placeholder="Ej. Cumpleaños, aniversario, alergia a los mariscos..."></textarea>
+                </div>
+
+                <div class="card p-3 mb-4" style="background-color: #fdf8f5; border: 1px solid #E8D0A5;">
+                    <h5 class="text-center" style="color: #5C162E;">Adelanto de Reserva</h5>
+                    <p class="text-center small text-muted">Escanea el QR para realizar el pago o adelanto, y sube tu comprobante para habilitar el botón de confirmación.</p>
+                    
+                    <div class="text-center mb-3">
+                        <img src="{{ url_for('static', filename='img/qr_pago.png') }}" alt="QR de Pago" style="max-width: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <div class="mb-2">
+                        <label><strong>Subir Comprobante de Pago</strong></label>
+                        <input type="file" name="comprobante" id="inputComprobante" class="form-control" accept=".pdf, image/png, image/jpeg, image/jpg" required>
+                    </div>
                 </div>
                 
-                <button type="submit" class="btn btn-elegant w-100">Confirmar Solicitud de Reserva</button>
+                <button type="submit" id="btnConfirmar" class="btn btn-elegant w-100" disabled>Confirmar Solicitud de Reserva</button>
                 <a href="{{ url_for('menu_bp.listar_menus') }}" class="btn btn-outline-secondary w-100 mt-2">Volver al Menú</a>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('inputComprobante').addEventListener('change', function() {
+        var btn = document.getElementById('btnConfirmar');
+        if (this.value) {
+            btn.disabled = false;
+        } else {
+            btn.disabled = true;
+        }
+    });
+</script>
 {% endblock %}
