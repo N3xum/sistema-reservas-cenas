@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 mt-5">
+    <div class="col-md-6 mt-4">
         <div class="card card-elegant p-4">
-            <h2 class="text-center mb-4">Únete a la Experiencia</h2>
+            <h3 class="text-center mb-4">Registrar Usuario Interno</h3>
             <form method="POST">
                 <div class="mb-3">
                     <label>Nombre Completo</label>
@@ -14,11 +14,18 @@
                     <input type="email" name="email" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Contraseña</label>
+                    <label>Contraseña Temporal</label>
                     <input type="password" name="password" class="form-control" required>
                 </div>
-                
-                <button type="submit" class="btn btn-elegant w-100">Registrarse</button>
+                <div class="mb-4">
+                    <label>Asignar Rol</label>
+                    <select name="rol" class="form-select">
+                        <option value="cliente">Cliente</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-elegant w-100">Crear Usuario</button>
+                <a href="{{ url_for('usuario_bp.listar_usuarios') }}" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
             </form>
         </div>
     </div>

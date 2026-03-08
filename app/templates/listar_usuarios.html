@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="mt-4">
-    <h2>Gestión de Usuarios</h2>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Gestión de Usuarios</h2>
+        <a href="{{ url_for('usuario_bp.crear_usuario_interno') }}" class="btn btn-elegant">+ Registrar Nuevo Usuario</a>
+    </div>
     
     <form method="GET" class="d-flex mb-4 mt-3" style="max-width: 400px;">
         <input class="form-control me-2" type="search" name="busqueda" placeholder="Buscar por nombre..." value="{{ busqueda }}">

@@ -26,7 +26,7 @@ def registro():
         nombre = request.form['nombre']
         email = request.form['email']
         password = request.form['password']
-        rol = request.form.get('rol', 'cliente') # Por defecto será cliente
+        rol = 'cliente' # Por defecto será cliente
 
         # Validación: Verificar si el correo ya existe [cite: 45]
         if Usuario.query.filter_by(email=email).first():
@@ -140,3 +140,32 @@ def eliminar_usuario(id):
     db.session.commit()
     flash('Usuario eliminado del sistema.')
     return redirect(url_for('usuario_bp.listar_usuarios'))
+
+@usuario_bp.route('/crear_usuario_interno', methods=['GET', 'POST'])
+@login_required
+def crear_usuario_interno():
+    # Restricción: Solo el administrador puede crear usuarios internamente
+    if current_user.rol != 'administrador':
+        flash('Acceso denegado.')
+        return redirect(url_for('usuario_bp.dashboard'))
+
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        email = request.form['email']
+        password = request.form['password']
+        rol = request.form['rol']
+
+        if Usuario.query.filter_by(email=email).first():
+            flash('El correo ya está registrado en el sistema.')
+            return redirect(url_for('usuario_bp.crear_usuario_interno'))
+
+        password_hash = generate_password_hash(password)
+        nuevo_usuario = Usuario(nombre=nombre, email=email, password_hash=password_hash, rol=rol)
+        
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        
+        flash(f'Usuario {nombre} creado exitosamente como {rol}.')
+        return redirect(url_for('usuario_bp.listar_usuarios'))
+        
+    return render_template('crear_usuario_interno.html')
