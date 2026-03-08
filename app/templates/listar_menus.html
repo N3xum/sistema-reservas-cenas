@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Experiencias Gastronómicas</h2>
+        {% if current_user.rol == 'administrador' %}
+            <a href="{{ url_for('menu_bp.crear_menu') }}" class="btn btn-elegant">+ Añadir Nuevo Menú</a>
+        {% endif %}
+    </div>
+
+    <form method="GET" class="d-flex mb-4" style="max-width: 400px;">
+        <input class="form-control me-2" type="search" name="busqueda" placeholder="Buscar menú por nombre..." value="{{ busqueda }}">
+        <button class="btn btn-elegant" type="submit">Buscar</button>
+    </form>
+
+    <div class="row">
+        {% for menu in menus %}
+            <div class="col-md-4 mb-4">
+                <div class="card card-elegant h-100 p-3">
+                    <h4 class="card-title" style="color: #5C162E;">{{ menu.nombre_experiencia }}</h4>
+                    <h6 class="text-muted">Bs. {{ menu.precio }}</h6>
+                    <p class="card-text mt-2">{{ menu.descripcion }}</p>
+                    
+                    <div class="mt-auto pt-3 border-top">
+                        {% if current_user.rol == 'administrador' %}
+                            <div class="d-flex justify-content-between">
+                                <span class="badge {% if menu.disponibilidad %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if menu.disponibilidad %}Disponible{% else %}Oculto{% endif %}
+                                </span>
+                                <div>
+                                    <a href="{{ url_for('menu_bp.editar_menu', id=menu.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                    <form action="{{ url_for('menu_bp.eliminar_menu', id=menu.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Seguro que deseas borrar este menú?');">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% else %}
+                            {% if menu.disponibilidad %}
+                                <span class="text-success"><i class="bi bi-check-circle"></i> Disponible para tu velada</span>
+                            {% else %}
+                                <span class="text-muted">Temporalmente no disponible</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p>No se encontraron menús que coincidan con tu búsqueda.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

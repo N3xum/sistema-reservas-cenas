@@ -38,7 +38,7 @@ def create_app():
     from .modulo_usuario import usuario_bp
     app.register_blueprint(usuario_bp)
     # -----------------------
-    # Registramos módulo Menu Roberto ---
+    # módulo Menu Roberto ---
     from .modulo_menu import menu_bp
     app.register_blueprint(menu_bp)
     
