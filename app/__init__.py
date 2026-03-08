@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config
 
-# Inicializamos las extensiones sin vincularlas a la app todavía
+# Inicializar las extensiones (sin vincularlas a la app)
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -13,7 +13,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Vinculamos las extensiones con la app
+    # Vincular las extensiones con la app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
@@ -26,7 +26,7 @@ def create_app():
         # Importamos los modelos para que Flask-Migrate los detecte
         from . import models
         
-    # --- AÑADE ESTO AQUÍ ---
+    # --- ---
     from .models import Usuario
 
     # Función para que Flask-Login sepa quién es el usuario actual
@@ -34,10 +34,13 @@ def create_app():
     def load_user(user_id):
         return Usuario.query.get(int(user_id))
 
-    # Registramos tu módulo de usuarios
+    # Registrar módulo usuarios
     from .modulo_usuario import usuario_bp
     app.register_blueprint(usuario_bp)
     # -----------------------
+    # Registramos módulo Menu Roberto ---
+    from .modulo_menu import menu_bp
+    app.register_blueprint(menu_bp)
     
 
     return app
