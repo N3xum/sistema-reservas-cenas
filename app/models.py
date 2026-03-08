@@ -40,3 +40,7 @@ class Reserva(db.Model):
     ubicacion_mesa = db.Column(db.String(50)) # Opciones: "Bajo el parral", "Comedor interior", etc.
     estado = db.Column(db.String(20), default='Pendiente') # Pendiente, Confirmada, Cancelada
     notas_especiales = db.Column(db.Text)
+
+    #notas_especiales = db.Column(db.Text, nullable=True)
+    # --- NUEVA COLUMNA PARA EL RETO DEL QR ---
+    comprobante_pago = db.Column(db.String(255), nullable=True)

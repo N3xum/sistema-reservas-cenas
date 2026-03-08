@@ -10,14 +10,29 @@
                 <p><strong>Menú:</strong> {{ reserva.menu_elegido.nombre_experiencia }}</p>
                 <p><strong>Fecha:</strong> {{ reserva.fecha_reserva.strftime('%d/%m/%Y') }} a las {{ reserva.hora_reserva.strftime('%H:%M') }}</p>
                 <p><strong>Notas:</strong> {{ reserva.notas_especiales or 'Ninguna' }}</p>
+                
+                <hr style="border-color: #E8D0A5;">
+                
+                <div class="mt-3">
+                    <strong>Adelanto / Pago:</strong><br>
+                    {% if reserva.comprobante_pago %}
+                        <a href="{{ url_for('static', filename='comprobantes/' + reserva.comprobante_pago) }}" target="_blank" class="btn btn-sm btn-outline-success mt-2">
+                            📄 Abrir Comprobante Adjunto
+                        </a>
+                        <small class="d-block text-muted mt-1">El cliente subió un archivo. Revisa el pago antes de confirmar.</small>
+                    {% else %}
+                        <span class="badge bg-danger mt-2">Sin comprobante</span>
+                        <small class="d-block text-muted mt-1">Esta reserva se hizo antes de activar los pagos por QR.</small>
+                    {% endif %}
+                </div>
             </div>
 
             <form method="POST">
                 <div class="mb-3">
                     <label>Estado de la Reserva</label>
                     <select name="estado" class="form-select">
-                        <option value="Pendiente" {% if reserva.estado == 'Pendiente' %}selected{% endif %}>Pendiente de pago/confirmación</option>
-                        <option value="Confirmada" {% if reserva.estado == 'Confirmada' %}selected{% endif %}>Confirmada</option>
+                        <option value="Pendiente" {% if reserva.estado == 'Pendiente' %}selected{% endif %}>Pendiente de revisión</option>
+                        <option value="Confirmada" {% if reserva.estado == 'Confirmada' %}selected{% endif %}>Confirmada (Pago verificado)</option>
                         <option value="Cancelada" {% if reserva.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
                     </select>
                 </div>

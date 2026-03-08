@@ -1,12 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
-from flask_login import login_required, current_user
-from datetime import datetime
+import os
 import io
 import openpyxl
+from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 from .models import Reserva, Menu
 from . import db
 
 reserva_bp = Blueprint('reserva_bp', __name__)
+
+# Configuración de la carpeta para guardar comprobantes
+CARPETA_COMPROBANTES = 'app/static/comprobantes'
 
 # 1. LEER (Listado con filtro de estado) y RETO EXTRA
 @reserva_bp.route('/reservas')
@@ -26,7 +31,7 @@ def listar_reservas():
     reservas = query.all()
     return render_template('listar_reservas.html', reservas=reservas, estado_filtro=estado_filtro)
 
-# 2. CREAR (El cliente reserva una cena)
+# 2. CREAR (El cliente reserva una cena y sube el pago)
 @reserva_bp.route('/reservas/crear/<int:menu_id>', methods=['GET', 'POST'])
 @login_required
 def crear_reserva(menu_id):
@@ -41,6 +46,17 @@ def crear_reserva(menu_id):
             flash('La fecha de la reserva no puede ser en el pasado.')
             return redirect(url_for('reserva_bp.crear_reserva', menu_id=menu_id))
 
+        # Lógica para subir el comprobante de pago
+        comprobante = request.files.get('comprobante')
+        nombre_comprobante = None
+        
+        if comprobante and comprobante.filename != '':
+            nombre_comprobante = secure_filename(comprobante.filename)
+            ruta_guardado = os.path.join(CARPETA_COMPROBANTES, nombre_comprobante)
+            # Crea la carpeta automáticamente si no existe
+            os.makedirs(CARPETA_COMPROBANTES, exist_ok=True)
+            comprobante.save(ruta_guardado)
+
         nueva_reserva = Reserva(
             usuario_id=current_user.id,
             menu_id=menu.id,
@@ -48,11 +64,12 @@ def crear_reserva(menu_id):
             hora_reserva=request.form['hora_reserva'],
             cantidad_personas=request.form['cantidad_personas'],
             ubicacion_mesa=request.form['ubicacion_mesa'],
-            notas_especiales=request.form['notas_especiales']
+            notas_especiales=request.form['notas_especiales'],
+            comprobante_pago=nombre_comprobante  # Se guarda el nombre del archivo en la BD
         )
         db.session.add(nueva_reserva)
         db.session.commit()
-        flash('¡Tu reserva ha sido enviada! Te confirmaremos pronto.')
+        flash('¡Tu reserva y pago han sido enviados! Te confirmaremos pronto.')
         return redirect(url_for('reserva_bp.listar_reservas'))
         
     return render_template('crear_reserva.html', menu=menu)
