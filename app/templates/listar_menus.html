@@ -17,6 +17,7 @@
         {% for menu in menus %}
             <div class="col-md-4 mb-4">
                 <div class="card card-elegant h-100 p-3">
+                    
                     {% if menu.imagen_referencial %}
                         <img src="{{ url_for('static', filename='img/menus/' + menu.imagen_referencial) }}" class="card-img-top mb-3" alt="{{ menu.nombre_experiencia }}" style="height: 200px; object-fit: cover; border-radius: 8px;">
                     {% else %}
@@ -44,9 +45,9 @@
                             </div>
                         {% else %}
                             {% if menu.disponibilidad %}
-                                <span class="text-success"><i class="bi bi-check-circle"></i> Disponible para tu velada</span>
+                                <a href="{{ url_for('reserva_bp.crear_reserva', menu_id=menu.id) }}" class="btn btn-elegant w-100">Reservar este menú</a>
                             {% else %}
-                                <span class="text-muted">Temporalmente no disponible</span>
+                                <span class="text-muted d-block text-center">Temporalmente no disponible</span>
                             {% endif %}
                         {% endif %}
                     </div>
