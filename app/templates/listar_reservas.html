@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de Reservas</h2>
+        
+        {% if current_user.rol == 'administrador' %}
+            <a href="{{ url_for('reserva_bp.exportar_excel') }}" class="btn btn-success" style="background-color: #198754; border: none;">
+                📊 Descargar Reporte en Excel
+            </a>
+        {% else %}
+            <a href="{{ url_for('menu_bp.listar_menus') }}" class="btn btn-elegant">Explorar Menús</a>
+        {% endif %}
+    </div>
+
+    <form method="GET" class="d-flex mb-4" style="max-width: 400px;">
+        <select name="estado" class="form-select me-2">
+            <option value="">Todos los estados</option>
+            <option value="Pendiente" {% if estado_filtro == 'Pendiente' %}selected{% endif %}>Pendientes</option>
+            <option value="Confirmada" {% if estado_filtro == 'Confirmada' %}selected{% endif %}>Confirmadas</option>
+            <option value="Cancelada" {% if estado_filtro == 'Cancelada' %}selected{% endif %}>Canceladas</option>
+        </select>
+        <button class="btn btn-elegant" type="submit">Filtrar</button>
+    </form>
+
+    <div class="card card-elegant p-3">
+        <table class="table table-hover mt-2">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    {% if current_user.rol == 'administrador' %}
+                        <th>Cliente</th>
+                    {% endif %}
+                    <th>Menú Elegido</th>
+                    <th>Fecha y Hora</th>
+                    <th>Mesa</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                    <td>#{{ reserva.id }}</td>
+                    {% if current_user.rol == 'administrador' %}
+                        <td>{{ reserva.cliente.nombre }}</td>
+                    {% endif %}
+                    <td>{{ reserva.menu_elegido.nombre_experiencia }}</td>
+                    <td>{{ reserva.fecha_reserva.strftime('%d/%m/%Y') }} a las {{ reserva.hora_reserva.strftime('%H:%M') }}</td>
+                    <td>{{ reserva.ubicacion_mesa }} ({{ reserva.cantidad_personas }} pax)</td>
+                    <td>
+                        <span class="badge 
+                            {% if reserva.estado == 'Confirmada' %}bg-success
+                            {% elif reserva.estado == 'Pendiente' %}bg-warning text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ reserva.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if current_user.rol == 'administrador' %}
+                            <a href="{{ url_for('reserva_bp.editar_reserva', id=reserva.id) }}" class="btn btn-sm btn-outline-secondary">Gestionar</a>
+                        {% endif %}
+                        
+                        <form action="{{ url_for('reserva_bp.eliminar_reserva', id=reserva.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Seguro que deseas cancelar esta reserva?');">Cancelar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No hay reservas que mostrar.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
