@@ -1,10 +1,15 @@
+import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 from .models import Menu
 from . import db
 
-# Creamos el Blueprint para el módulo de menús
+# Crear el Blueprint para el módulo de menús
 menu_bp = Blueprint('menu_bp', __name__)
+
+# Configurar de la carpeta donde se guardarán las fotos
+CARPETA_IMAGENES = 'app/static/img/menus'
 
 # 1. LEER (Listado con buscador)
 @menu_bp.route('/menus')
@@ -12,7 +17,7 @@ menu_bp = Blueprint('menu_bp', __name__)
 def listar_menus():
     busqueda = request.args.get('busqueda', '')
     if busqueda:
-        # Filtro de búsqueda requerido por el examen
+        # Filtro de búsqueda 
         menus = Menu.query.filter(Menu.nombre_experiencia.contains(busqueda)).all()
     else:
         menus = Menu.query.all()
@@ -30,16 +35,29 @@ def crear_menu():
         nombre = request.form['nombre_experiencia']
         precio = request.form['precio']
         
-        # Validación requerida por el examen
+        # Validación
         if float(precio) <= 0:
             flash('El precio debe ser un valor válido y mayor a 0.')
             return redirect(url_for('menu_bp.crear_menu'))
+
+        # guardar la imagen
+        imagen = request.files.get('imagen')
+        nombre_imagen = '' # Vacío si el usuario no sube ninguna foto
+        
+        if imagen and imagen.filename != '':
+            nombre_imagen = secure_filename(imagen.filename)
+            ruta_guardado = os.path.join(CARPETA_IMAGENES, nombre_imagen)
+            
+            # Crea la carpeta automáticamente si no existe
+            os.makedirs(CARPETA_IMAGENES, exist_ok=True)
+            imagen.save(ruta_guardado)
 
         nuevo_menu = Menu(
             nombre_experiencia=nombre,
             descripcion=request.form['descripcion'],
             precio=precio,
-            disponibilidad='disponibilidad' in request.form
+            disponibilidad='disponibilidad' in request.form,
+            imagen_referencial=nombre_imagen # Se guarda el nombre en la Base de Datos
         )
         db.session.add(nuevo_menu)
         db.session.commit()
@@ -63,6 +81,17 @@ def editar_menu(id):
         menu.descripcion = request.form['descripcion']
         menu.precio = request.form['precio']
         menu.disponibilidad = 'disponibilidad' in request.form
+        
+        # Lógica para actualizar la foto si sube una nueva
+        imagen = request.files.get('imagen')
+        if imagen and imagen.filename != '':
+            nombre_imagen = secure_filename(imagen.filename)
+            ruta_guardado = os.path.join(CARPETA_IMAGENES, nombre_imagen)
+            os.makedirs(CARPETA_IMAGENES, exist_ok=True)
+            imagen.save(ruta_guardado)
+            
+            # Actualizar el nombre del archivo en la BD solo si subió una nueva
+            menu.imagen_referencial = nombre_imagen
         
         db.session.commit()
         flash('Menú actualizado correctamente.')

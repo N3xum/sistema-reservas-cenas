@@ -58,6 +58,10 @@
       <ul class="navbar-nav ms-auto">
         {% if current_user.is_authenticated %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('usuario_bp.dashboard') }}">Inicio</a></li>
+            
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('menu_bp.listar_menus') }}">Menús</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('reserva_bp.listar_reservas') }}">Reservas</a></li>
+            
             {% if current_user.rol == 'administrador' %}
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('usuario_bp.listar_usuarios') }}">Usuarios</a></li>
             {% endif %}
