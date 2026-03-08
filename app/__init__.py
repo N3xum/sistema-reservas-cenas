@@ -38,9 +38,12 @@ def create_app():
     from .modulo_usuario import usuario_bp
     app.register_blueprint(usuario_bp)
     # -----------------------
-    # Registramos módulo Menu Roberto ---
+    # módulo Menu Roberto ---
     from .modulo_menu import menu_bp
     app.register_blueprint(menu_bp)
     
+    # módulo de Jhilda ---
+    from .modulo_reserva import reserva_bp
+    app.register_blueprint(reserva_bp)
 
     return app

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 mt-4">
+        <div class="card card-elegant p-4">
+            <h3 class="text-center mb-2">Agendar tu Velada</h3>
+            <p class="text-center text-muted mb-4">Estás reservando: <strong>{{ menu.nombre_experiencia }}</strong> (Bs. {{ menu.precio }} p/p)</p>
+            
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Fecha de la Cena</label>
+                        <input type="date" name="fecha_reserva" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Hora de Llegada</label>
+                        <input type="time" name="hora_reserva" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Cantidad de Personas</label>
+                        <input type="number" name="cantidad_personas" class="form-control" min="2" max="10" required placeholder="Mínimo 2 personas">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Ubicación Preferida</label>
+                        <select name="ubicacion_mesa" class="form-select" required>
+                            <option value="Bajo el parral">Mesa exterior (Bajo el parral)</option>
+                            <option value="Comedor interior">Mesa interior (Ambiente rústico)</option>
+                            <option value="Jardín">Jardín trasero</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label>Peticiones Especiales o Alergias</label>
+                    <textarea name="notas_especiales" class="form-control" rows="3" placeholder="Ej. Cumpleaños, aniversario, alergia a los mariscos..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-elegant w-100">Confirmar Solicitud de Reserva</button>
+                <a href="{{ url_for('menu_bp.listar_menus') }}" class="btn btn-outline-secondary w-100 mt-2">Volver al Menú</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

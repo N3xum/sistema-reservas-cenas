@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mt-4">
+        <div class="card card-elegant p-4">
+            <h3 class="text-center mb-4">Gestionar Reserva #{{ reserva.id }}</h3>
+            
+            <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px;">
+                <p><strong>Cliente:</strong> {{ reserva.cliente.nombre }}</p>
+                <p><strong>Menú:</strong> {{ reserva.menu_elegido.nombre_experiencia }}</p>
+                <p><strong>Fecha:</strong> {{ reserva.fecha_reserva.strftime('%d/%m/%Y') }} a las {{ reserva.hora_reserva.strftime('%H:%M') }}</p>
+                <p><strong>Notas:</strong> {{ reserva.notas_especiales or 'Ninguna' }}</p>
+            </div>
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label>Estado de la Reserva</label>
+                    <select name="estado" class="form-select">
+                        <option value="Pendiente" {% if reserva.estado == 'Pendiente' %}selected{% endif %}>Pendiente de pago/confirmación</option>
+                        <option value="Confirmada" {% if reserva.estado == 'Confirmada' %}selected{% endif %}>Confirmada</option>
+                        <option value="Cancelada" {% if reserva.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label>Ubicación de la Mesa Asignada</label>
+                    <select name="ubicacion_mesa" class="form-select">
+                        <option value="Bajo el parral" {% if reserva.ubicacion_mesa == 'Bajo el parral' %}selected{% endif %}>Mesa exterior (Bajo el parral)</option>
+                        <option value="Comedor interior" {% if reserva.ubicacion_mesa == 'Comedor interior' %}selected{% endif %}>Mesa interior (Ambiente rústico)</option>
+                        <option value="Jardín" {% if reserva.ubicacion_mesa == 'Jardín' %}selected{% endif %}>Jardín trasero</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-elegant w-100">Guardar Cambios</button>
+                <a href="{{ url_for('reserva_bp.listar_reservas') }}" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
