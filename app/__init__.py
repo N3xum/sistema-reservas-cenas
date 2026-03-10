@@ -19,7 +19,7 @@ def create_app():
     login_manager.init_app(app)
 
     # Configuración de Flask-Login para la autenticación
-    login_manager.login_view = 'auth.login' # Esta ruta la crearemos luego
+    login_manager.login_view = 'usuario_bp.login' 
     login_manager.login_message = "Por favor, inicia sesión para acceder a esta página."
 
     with app.app_context():
@@ -29,20 +29,20 @@ def create_app():
     # --- ---
     from .models import Usuario
 
-    # Función para que Flask-Login sepa quién es el usuario actual
+    # Función para que Flask-Login sepa quien es el usuario actual
     @login_manager.user_loader
     def load_user(user_id):
         return Usuario.query.get(int(user_id))
 
-    # Registrar módulo usuarios
+    # Registrar modulo usuarios
     from .modulo_usuario import usuario_bp
     app.register_blueprint(usuario_bp)
-    # -----------------------
-    # módulo Menu Roberto ---
+ 
+    # modulo Menu Roberto 
     from .modulo_menu import menu_bp
     app.register_blueprint(menu_bp)
     
-    # módulo de Jhilda ---
+    # modulo de Jhilda 
     from .modulo_reserva import reserva_bp
     app.register_blueprint(reserva_bp)
 
