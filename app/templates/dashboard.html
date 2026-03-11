@@ -16,6 +16,18 @@
         <a href="{{ url_for('menu_bp.listar_menus') }}" class="btn btn-elegant mt-2 me-2">Gestionar Menús</a>
         <a href="{{ url_for('reserva_bp.listar_reservas') }}" class="btn btn-elegant mt-2 me-2">Ver Todas las Reservas</a>
         <a href="{{ url_for('usuario_bp.listar_usuarios') }}" class="btn btn-elegant mt-2 me-2">Gestionar Usuarios</a>
+        <div class="card card-elegant mt-5 p-4 text-center" style="border: 2px solid #E8D0A5;">
+        <h3 style="color: #5C162E;">🧠 Dashboard de Inteligencia Artificial</h3>
+        <p class="text-muted">Análisis de datos de Detalle Añejo impulsado por Google Gemini</p>
+        
+        <div class="d-flex justify-content-center flex-wrap mt-3" style="gap: 15px;">
+            <a href="{{ url_for('usuario_bp.analisis_ia_clientes') }}" class="btn btn-warning">
+                📊 Analizar Base de Clientes
+            </a>
+            
+            </div>
+    </div>
+
     {% else %}
         <h3 class="mb-4">Tu Próxima Reserva</h3>
         <p>Bienvenido, {{ current_user.nombre }}. Explora nuestros menús de tres tiempos y asegura tu fecha especial.</p>
