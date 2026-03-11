@@ -7,6 +7,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from .models import Reserva, Menu
 from . import db
+from .ia_service import consultar_gemini
 
 reserva_bp = Blueprint('reserva_bp', __name__)
 
@@ -148,3 +149,26 @@ def exportar_excel():
     output.seek(0)
     
     return send_file(output, download_name="Reporte_Cenas.xlsx", as_attachment=True)
+
+@reserva_bp.route('/analisis_ia_reservas')
+@login_required
+def analisis_ia_reservas():
+    # Solo el administrador puede ver esto
+    if current_user.rol != 'administrador':
+        return redirect(url_for('usuario_bp.dashboard'))
+    
+    # Jhilda: Contamos cómo están las reservas
+    confirmadas = Reserva.query.filter_by(estado='Confirmada').count()
+    pendientes = Reserva.query.filter_by(estado='Pendiente').count()
+    canceladas = Reserva.query.filter_by(estado='Cancelada').count()
+    
+    contexto = f"Datos actuales: {confirmadas} confirmadas, {pendientes} pendientes de revisión y {canceladas} canceladas."
+    pregunta = "Eres la IA analista de Detalle Añejo. Analiza el estado de las reservas. Si hay muchas canceladas, sugiere una estrategia de retención. Si hay muchas pendientes, avísale al administrador que debe apurarse a revisarlas para no perder clientes. Dame una predicción simple para la operación de la cocina."
+    
+    analisis = consultar_gemini(pregunta, contexto)
+    
+    return render_template('analisis_reservas.html', 
+                           confirmadas=confirmadas, 
+                           pendientes=pendientes, 
+                           canceladas=canceladas, 
+                           analisis_ia=analisis)
