@@ -194,3 +194,4 @@ def analisis_ia_clientes():
                            clientes=clientes, 
                            admins=admins, 
                            analisis_ia=analisis_generado)
+

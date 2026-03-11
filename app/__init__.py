@@ -46,4 +46,7 @@ def create_app():
     from .modulo_reserva import reserva_bp
     app.register_blueprint(reserva_bp)
 
+    from .modulo_chat import chat_bp
+    app.register_blueprint(chat_bp)
+
     return app
