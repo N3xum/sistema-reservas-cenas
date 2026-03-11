@@ -20,7 +20,7 @@ def chat_ia():
         contexto_datos = "El usuario pregunta por menus o precios. (Aviso interno: Roberto conectara la tabla Menu aqui)."
         
     # 2. LÓGICA DE JHILDA (Rastreador de Reservas)
-    elif "reserva" in mensaje_minusculas or "confirmada" in mensaje_minusculas or "estado" in mensaje_minusculas or "mesa" in mensaje_minusculas:
+    elif "mis reservas" in mensaje_minusculas or "mi reserva" in mensaje_minusculas or "tengo reservas" in mensaje_minusculas or "tengo alguna reserva" in mensaje_minusculas or "mi estado" in mensaje_minusculas:
         
         # Jhilda: Consultamos solo las reservas del cliente que está escribiendo
         mis_reservas = Reserva.query.filter_by(usuario_id=current_user.id).all()
@@ -45,10 +45,10 @@ def chat_ia():
         """
         
     # 3. TU LOGICA PETER (Termómetro de Disponibilidad)
-    elif "espacio" in mensaje_minusculas or "disponibilidad" in mensaje_minusculas or "lleno" in mensaje_minusculas or "ocupado" in mensaje_minusculas or "mesas" in mensaje_minusculas or "mañana" in mensaje_minusculas or "hoy" in mensaje_minusculas:
+    elif "espacio" in mensaje_minusculas or "disponibilidad" in mensaje_minusculas or "disponible" in mensaje_minusculas or "lugar" in mensaje_minusculas or "lleno" in mensaje_minusculas or "ocupado" in mensaje_minusculas or "mesas" in mensaje_minusculas or "mesa" in mensaje_minusculas or "para el" in mensaje_minusculas or "mañana" in mensaje_minusculas or "hoy" in mensaje_minusculas:
         
         from datetime import date
-        fecha_hoy = date.today() # ¡El reloj del sistema!
+        fecha_hoy = date.today()
         
         # Consultamos TODAS las reservas confirmadas de hoy en adelante
         reservas_activas = Reserva.query.filter(Reserva.estado == 'Confirmada', Reserva.fecha_reserva >= fecha_hoy).all()
@@ -56,24 +56,22 @@ def chat_ia():
         # Armamos un diccionario contando cuántas mesas están ocupadas por día
         resumen_fechas = {}
         for res in reservas_activas:
-            fecha_str = str(res.fecha_reserva) # Ej: '2026-03-10'
+            fecha_str = str(res.fecha_reserva) # Ej: '2026-03-21'
             resumen_fechas[fecha_str] = resumen_fechas.get(fecha_str, 0) + 1
             
         contexto_datos = f"""
         El usuario quiere saber la disponibilidad de mesas de Detalle Añejo.
-        IMPORTANTE: Nuestra capacidad máxima por noche es de 10 mesas en el parral.
+        Nuestra capacidad máxima por noche es de 10 mesas en el parral.
         
-        ⏳ FECHA ACTUAL DEL SISTEMA: {fecha_hoy}
-        (Usa esta fecha exacta como punto de partida cuando el usuario diga "hoy", "mañana", "el viernes", etc.)
+        ⏳ FECHA ACTUAL DEL SISTEMA: {fecha_hoy} (Año: {fecha_hoy.year})
         
-        Aquí tienes el reporte de las mesas YA CONFIRMADAS por fecha:
+        Aquí tienes el reporte de las mesas YA CONFIRMADAS por fecha (en formato AAAA-MM-DD):
         {resumen_fechas}
         
         Instrucción Estricta: 
-        1. Analiza para cuándo quiere la mesa el usuario (calcula la fecha basándote en la fecha actual).
-        2. Revisa el reporte. Si la fecha no aparece en el reporte, significa que hay 0 reservas (tenemos las 10 mesas libres).
-        3. Si la fecha tiene 7 o más mesas ocupadas, dile que hay alta demanda y sugiérele reservar urgente.
-        4. Si tiene menos de 7, dile con entusiasmo que hay excelente disponibilidad y anímalo a agendar su cena romántica.
+        1. Identifica qué fecha pide el usuario. Si dice por ejemplo "21 de marzo", deduce automáticamente que se refiere a la fecha {fecha_hoy.year}-03-21. Si dice "mañana", súmale un día a la fecha actual.
+        2. Revisa el reporte para esa fecha exacta. Si la fecha no aparece en el reporte, significa que hay 0 reservas (las 10 mesas están libres).
+        3. Respóndele de forma elegante. Si tiene 7 o más mesas ocupadas, dile que hay alta demanda. Si tiene menos, anímalo a reservar su cena rústica indicando que hay buena disponibilidad.
         """
         
     # 4. RESPUESTA POR DEFECTO
@@ -81,9 +79,9 @@ def chat_ia():
         contexto_datos = """
         El usuario saluda o hace una pregunta general. 
         Instruccion: Dale la bienvenida a Detalle Anejo y dile brevemente que puedes ayudarle a:
-        1. Recomendarle un menu.
+        1. Recomendarle un menú para su velada.
         2. Revisar el estado de sus reservas.
-        3. Consultar los datos de su cuenta.
+        3. Consultar la disponibilidad de mesas para una fecha específica
         """
         
     respuesta_ia = consultar_gemini(mensaje_original, contexto_datos)
