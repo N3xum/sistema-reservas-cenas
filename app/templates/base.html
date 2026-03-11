@@ -86,6 +86,78 @@
 
     {% block content %}{% endblock %}
 </div>
+<div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <button id="chatbot-btn" class="btn" style="background-color: #5C162E; color: white; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); font-size: 24px;">
+        💬
+    </button>
+    
+    <div id="chatbot-window" style="display: none; width: 320px; height: 450px; background-color: white; border: 2px solid #E8D0A5; border-radius: 10px; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: absolute; bottom: 75px; right: 0; overflow: hidden;">
+        
+        <div style="background-color: #5C162E; color: white; padding: 12px; text-align: center;">
+            <strong>🤖 Conserje Virtual Anejo</strong>
+        </div>
+        
+        <div id="chatbot-messages" style="flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9em; display: flex; flex-direction: column; gap: 10px; background-color: #fafafa;">
+            <div style="background-color: #e9ecef; color: #333; padding: 10px; border-radius: 10px; border-top-left-radius: 0; align-self: flex-start; max-width: 85%;">
+                ¡Hola! Soy el conserje de Detalle Anejo. ¿En que te puedo ayudar hoy?
+            </div>
+        </div>
+        
+        <div style="padding: 10px; border-top: 1px solid #ddd; display: flex; background-color: white;">
+            <input type="text" id="chatbot-input" class="form-control form-control-sm" placeholder="Escribe tu consulta..." style="border-radius: 4px 0 0 4px; border: 1px solid #ccc;">
+            <button id="chatbot-send" class="btn btn-sm" style="background-color: #E8D0A5; color: #5C162E; border-radius: 0 4px 4px 0; font-weight: bold;">Enviar</button>
+        </div>
+    </div>
+</div>
+<script>
+    const chatBtn = document.getElementById('chatbot-btn');
+    const chatWindow = document.getElementById('chatbot-window');
+    const chatInput = document.getElementById('chatbot-input');
+    const chatSend = document.getElementById('chatbot-send');
+    const chatMessages = document.getElementById('chatbot-messages');
 
+    // Abrir o cerrar el chat
+    chatBtn.addEventListener('click', () => {
+        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    // Funcion para mandar el mensaje
+    const sendMessage = async () => {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        // Dibujar el mensaje del cliente (Color Oro)
+        chatMessages.innerHTML += `<div style="background-color: #E8D0A5; color: #5C162E; padding: 10px; border-radius: 10px; border-top-right-radius: 0; align-self: flex-end; max-width: 85%;"><strong>Tu:</strong> ${text}</div>`;
+        chatInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Dibujar el estado "Pensando..."
+        const typingId = 'typing-' + Date.now();
+        chatMessages.innerHTML += `<div id="${typingId}" style="background-color: #e9ecef; color: #333; padding: 10px; border-radius: 10px; border-top-left-radius: 0; align-self: flex-start; max-width: 85%;"><em>Pensando... 🍷</em></div>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            // Mandar a Python
+            const response = await fetch('/chat_ia', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensaje: text })
+            });
+            const data = await response.json();
+            
+            // Borrar "Pensando..." y poner la respuesta real
+            document.getElementById(typingId).remove();
+            chatMessages.innerHTML += `<div style="background-color: #e9ecef; color: #333; padding: 10px; border-radius: 10px; border-top-left-radius: 0; align-self: flex-start; max-width: 85%;"><strong>Conserje:</strong> ${data.respuesta}</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } catch (error) {
+            document.getElementById(typingId).innerHTML = "Lo siento, perdi la conexion con la cocina.";
+        }
+    };
+
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
 </body>
 </html>

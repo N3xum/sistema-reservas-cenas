@@ -8,7 +8,7 @@ class Usuario(UserMixin, db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    rol = db.Column(db.String(20), nullable=False, default='cliente') # 'administrador' o 'cliente'
+    rol = db.Column(db.String(20), nullable=False, default='cliente') 
     telefono = db.Column(db.String(20))
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
 
