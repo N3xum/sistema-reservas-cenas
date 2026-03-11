@@ -13,7 +13,7 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # 3. Elegir el modelo (Usamos la versión 1.5 Flash porque es súper rápida y gratuita)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 def consultar_gemini(mensaje_usuario, contexto_datos=""):
     """

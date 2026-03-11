@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import Usuario
 from . import db
-
+from .ia_service import consultar_gemini
 # Creamos el Blueprint para este módulo
 usuario_bp = Blueprint('usuario_bp', __name__)
 
@@ -12,7 +12,7 @@ usuario_bp = Blueprint('usuario_bp', __name__)
 # ==========================================
 @usuario_bp.route('/')
 def index():
-    # Si alguien entra a la raíz, lo mandamos al login
+    # Si alguien entra a la raiz, lo mandamos al login
     return redirect(url_for('usuario_bp.login'))
 
 
@@ -78,12 +78,12 @@ def dashboard():
 @usuario_bp.route('/usuarios')
 @login_required
 def listar_usuarios():
-    # Restricción de vistas según rol [cite: 31]
+    # Restricción de vistas según rol
     if current_user.rol != 'administrador':
         flash('Acceso denegado. Esta vista es solo para administradores.')
         return redirect(url_for('usuario_bp.dashboard'))
 
-    # Leer (listado con búsqueda o filtro) 
+    # Leer (listado con bsqueda o filtro) 
     busqueda = request.args.get('busqueda', '')
     if busqueda:
         # Filtra los usuarios si se escribió algo en el buscador
@@ -169,3 +169,28 @@ def crear_usuario_interno():
         return redirect(url_for('usuario_bp.listar_usuarios'))
         
     return render_template('crear_usuario_interno.html')
+
+@usuario_bp.route('/analisis_ia_clientes')
+@login_required
+def analisis_ia_clientes():
+    if current_user.rol != 'administrador':
+        flash('Acceso denegado al panel de inteligencia.')
+        return redirect(url_for('usuario_bp.dashboard'))
+    
+    # 1. Extraer datos reales de tu tabla Usuario
+    total_usuarios = Usuario.query.count()
+    clientes = Usuario.query.filter_by(rol='cliente').count()
+    admins = Usuario.query.filter_by(rol='administrador').count()
+    
+    # 2. Armar el contexto para la IA
+    contexto_datos = f"Total de cuentas: {total_usuarios}. Clientes: {clientes}. Administradores del sistema: {admins}."
+    pregunta_admin = "Genera un breve párrafo analizando el tamaño de nuestra base de clientes registrados. Comenta sobre la proporción entre clientes y administradores, e indica si es una métrica saludable para el inicio de operaciones de nuestro restaurante rústico."
+    
+    # 3. Consultar a Gemini
+    analisis_generado = consultar_gemini(pregunta_admin, contexto_datos)
+    
+    # 4. Enviar los datos y la respuesta de la IA al HTML
+    return render_template('analisis_clientes.html', 
+                           clientes=clientes, 
+                           admins=admins, 
+                           analisis_ia=analisis_generado)
