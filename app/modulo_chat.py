@@ -19,9 +19,30 @@ def chat_ia():
     if "menu" in mensaje_minusculas or "plato" in mensaje_minusculas or "recomienda" in mensaje_minusculas or "precio" in mensaje_minusculas:
         contexto_datos = "El usuario pregunta por menus o precios. (Aviso interno: Roberto conectara la tabla Menu aqui)."
         
-    # 2. LOGICA DE JHILDA (Rastreador de Reservas)
-    elif "reserva" in mensaje_minusculas or "confirmada" in mensaje_minusculas or "fecha" in mensaje_minusculas:
-        contexto_datos = "El usuario pregunta por su reserva. (Aviso interno: Jhilda conectara la tabla Reserva aqui)."
+    # 2. LÓGICA DE JHILDA (Rastreador de Reservas)
+    elif "reserva" in mensaje_minusculas or "confirmada" in mensaje_minusculas or "estado" in mensaje_minusculas or "mesa" in mensaje_minusculas:
+        
+        # Jhilda: Consultamos solo las reservas del cliente que está escribiendo
+        mis_reservas = Reserva.query.filter_by(usuario_id=current_user.id).all()
+        
+        if not mis_reservas:
+            detalle_reservas = "El usuario no tiene ninguna reserva en el sistema."
+        else:
+            detalle_reservas = ""
+            for r in mis_reservas:
+                # Ajusta 'fecha_reserva' o 'estado' si tus columnas se llaman diferente
+                detalle_reservas += f"- Fecha: {r.fecha_reserva}, Estado: {r.estado}\n"
+                
+        contexto_datos = f"""
+        El usuario está preguntando por el estado de sus reservas en Detalle Añejo.
+        Aquí está el historial real extraído de la base de datos:
+        {detalle_reservas}
+        
+        Instrucción Estricta: 
+        1. Si no tiene reservas, invítalo amablemente a agendar una cena romántica.
+        2. Si tiene reservas, léele las fechas y el estado. 
+        3. Si están 'Confirmadas', dile que la mesa bajo el parral lo espera. Si están 'Pendientes', dile que el administrador las aprobará pronto.
+        """
         
     # 3. TU LOGICA PETER (Termómetro de Disponibilidad)
     elif "espacio" in mensaje_minusculas or "disponibilidad" in mensaje_minusculas or "lleno" in mensaje_minusculas or "ocupado" in mensaje_minusculas or "mesas" in mensaje_minusculas or "mañana" in mensaje_minusculas or "hoy" in mensaje_minusculas:
