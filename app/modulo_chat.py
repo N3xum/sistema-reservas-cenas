@@ -15,9 +15,31 @@ def chat_ia():
     
     contexto_datos = ""
     
-    # 1. LOGICA DE ROBERTO (Recomendador de Menus)
-    if "menu" in mensaje_minusculas or "plato" in mensaje_minusculas or "recomienda" in mensaje_minusculas or "precio" in mensaje_minusculas:
-        contexto_datos = "El usuario pregunta por menus o precios. (Aviso interno: Roberto conectara la tabla Menu aqui)."
+    # 1. VALLEJOS ROBERTO (Menus)
+    if "menú" in mensaje_minusculas or "menu" in mensaje_minusculas or "plato" in mensaje_minusculas or "recomienda" in mensaje_minusculas or "precio" in mensaje_minusculas or "comida" in mensaje_minusculas:
+        
+        # Filtramos para que la IA solo vea los menús que sí están disponibles
+        menus_disponibles = Menu.query.filter_by(disponibilidad=True).all()
+        
+        if not menus_disponibles:
+            lista_menus = "Actualmente no hay menús registrados o disponibles."
+        else:
+            lista_menus = ""
+            for m in menus_disponibles:
+                # CORREGIDO: Usamos m.nombre_experiencia
+                lista_menus += f"- {m.nombre_experiencia}: {m.descripcion} (Precio: {m.precio} Bs)\n"
+                
+        contexto_datos = f"""
+        El usuario está preguntando por nuestra oferta gastronómica en Detalle Añejo.
+        Aquí tienes la lista real de menús extraída de la base de datos:
+        {lista_menus}
+        
+        Instrucción Estricta: 
+        1. Actúa como el Maître experto del restaurante.
+        2. Analiza lo que pide el usuario (ej: si busca algo económico, para un aniversario, etc.).
+        3. Recomiéndale de forma elegante y persuasiva UNA o DOS opciones de la lista que mejor encajen.
+        4. Menciona siempre el precio y la descripción para antojar al cliente.
+        """
         
     # 2. LÓGICA DE JHILDA (Rastreador de Reservas)
     elif "mis reservas" in mensaje_minusculas or "mi reserva" in mensaje_minusculas or "tengo reservas" in mensaje_minusculas or "tengo alguna reserva" in mensaje_minusculas or "mi estado" in mensaje_minusculas:
