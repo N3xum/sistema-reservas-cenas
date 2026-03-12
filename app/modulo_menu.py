@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from .models import Menu
 from . import db
+from .ia_service import consultar_gemini
 
 # Crear el Blueprint para el módulo de menús
 menu_bp = Blueprint('menu_bp', __name__)
@@ -112,3 +113,30 @@ def eliminar_menu(id):
     db.session.commit()
     flash('Menú eliminado del catálogo.')
     return redirect(url_for('menu_bp.listar_menus'))
+
+
+#analisis menu (Dashboard)
+
+@menu_bp.route('/analisis_ia_menus')
+@login_required
+def analisis_ia_menus():
+    if current_user.rol != 'administrador':
+        return redirect(url_for('usuario_bp.dashboard'))
+    
+    # Traemos todos los menús para analizarlos
+    menus = Menu.query.all()
+    
+    # CORREGIDO: Usamos nombre_experiencia para el gráfico
+    nombres = [m.nombre_experiencia for m in menus]
+    precios = [float(m.precio) for m in menus]
+    
+    # CORREGIDO: Usamos nombre_experiencia para el contexto de la IA
+    contexto = f"Tenemos {len(menus)} menús. Lista con precios: " + ", ".join([f"{m.nombre_experiencia} ({m.precio} Bs)" for m in menus])
+    pregunta = "Eres un consultor gastronómico analizando la carta de Detalle Añejo. Revisa nuestros menús y precios. ¿Tenemos una oferta equilibrada? Genera un párrafo corto dándole al administrador un consejo de negocio sobre estos precios."
+    
+    analisis = consultar_gemini(pregunta, contexto)
+    
+    return render_template('analisis_menus.html', 
+                           nombres=nombres, 
+                           precios=precios, 
+                           analisis_ia=analisis)
