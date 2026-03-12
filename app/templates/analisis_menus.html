@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-4">
+    <h2 class="mb-4">🤖 Panel de Inteligencia: Análisis de Menús</h2>
+    <div class="row">
+        <div class="col-md-5 mb-4">
+            <div class="card card-elegant p-3 text-center">
+                <h4>Comparativa de Precios (Bs)</h4>
+                <canvas id="graficoMenus" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <div class="col-md-7 mb-4">
+            <div class="card p-4" style="background-color: #f8f9fa; border-left: 5px solid #ffc107;">
+                <h4 style="color: #d39e00;">🧠 Consultoría de Carta por IA</h4>
+                <hr>
+                <p style="font-size: 1.1rem;">{{ analisis_ia }}</p>
+                <div class="mt-3 text-end"><span class="badge bg-secondary">Powered by Google Gemini</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('graficoMenus').getContext('2d');
+    new Chart(ctx, {
+        type: 'polarArea', // Gráfico polar para Roberto
+        data: {
+            // Recibimos la lista de Python usando el filtro |safe para evitar errores de comillas
+            labels: {{ nombres | safe }},
+            datasets: [{
+                label: 'Precio en Bs',
+                data: {{ precios | safe }},
+                backgroundColor: ['#5C162E', '#E8D0A5', '#28a745', '#17a2b8', '#6c757d']
+            }]
+        }
+    });
+</script>
+{% endblock %}
